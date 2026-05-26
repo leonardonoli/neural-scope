@@ -1,0 +1,19 @@
+[project]
+name = "viz-model-backend"
+version = "0.1.0"
+description = "Transparent transformer visualizer — backend"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "websockets>=13",
+    "transformers>=4.45",
+    "torch>=2.3",
+    "umap-learn>=0.5",
+    "numpy>=1.26",
+    "scipy>=1.13",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
