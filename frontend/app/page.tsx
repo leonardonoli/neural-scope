@@ -3,13 +3,18 @@ import { useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import TokenStream from "./components/TokenStream";
 import ProbChart from "./components/ProbChart";
+import TokenRace from "./components/TokenRace";
 import AttentionMap from "./components/AttentionMap";
 import GeneratedText from "./components/GeneratedText";
+import ModelStatus from "./components/ModelStatus";
+import Constellation from "./components/Constellation";
 
 const WS_URL = "ws://localhost:8001/generate";
 
 interface Token { id: number; text: string; start: number; end: number; }
 interface TopToken { token: string; id: number; prob: number; log_prob: number; }
+
+interface ConstellationPoint { id: number; token: string; x: number; y: number; }
 
 interface VizState {
   contextTokens: Token[];
@@ -19,6 +24,8 @@ interface VizState {
   newTokenIndex: number | null;
   generated: string;
   step: number;
+  entropyLog: number[];
+  constellation: ConstellationPoint[];
 }
 
 const INITIAL: VizState = {
@@ -29,6 +36,8 @@ const INITIAL: VizState = {
   newTokenIndex: null,
   generated: "",
   step: 0,
+  entropyLog: [],
+  constellation: [],
 };
 
 const PRESETS = [
@@ -82,6 +91,8 @@ export default function Home() {
           newTokenIndex: msg.context_tokens.length - 1,
           generated: prev.generated + msg.token.text,
           step: msg.step,
+          entropyLog: [...prev.entropyLog, msg.entropy ?? 0],
+          constellation: msg.constellation ?? [],
         }));
       }
     };
@@ -92,6 +103,8 @@ export default function Home() {
 
   return (
     <div style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+
+      <ModelStatus />
 
       {/* ── Header ── */}
       <div style={{
@@ -209,12 +222,12 @@ export default function Home() {
         </motion.button>
       </div>
 
-      {/* ── Main 2×2 grid ── */}
+      {/* ── Main grid: 2×2 top + constellation bottom ── */}
       <div style={{
         flex: 1,
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
-        gridTemplateRows: "1fr 1fr",
+        gridTemplateRows: "1fr 1fr 220px",
         gap: 6,
         padding: 8,
         overflow: "hidden",
@@ -226,12 +239,9 @@ export default function Home() {
           <GeneratedText prompt={prompt} generated={state.generated} isRunning={isRunning} />
         </Panel>
 
-        {/* TR: Token probability chart */}
+        {/* TR: Token race */}
         <Panel accentColor="var(--accent3)">
-          {state.topTokens.length > 0
-            ? <ProbChart tokens={state.topTokens} chosenId={state.chosenId} />
-            : <Empty label="NEXT TOKEN PROBABILITY" hint="watch the model choose its next word — every token, every step" />
-          }
+          <TokenRace tokens={state.topTokens} chosenId={state.chosenId} step={state.step} />
         </Panel>
 
         {/* BL: Token stream */}
@@ -250,12 +260,17 @@ export default function Home() {
           }
         </Panel>
 
+        {/* Bottom: Constellation — spans full width */}
+        <Panel accentColor="var(--accent2)" style={{ gridColumn: "1 / -1" }}>
+          <Constellation points={state.constellation} newIndex={state.constellation.length - 1} />
+        </Panel>
+
       </div>
     </div>
   );
 }
 
-function Panel({ children, accentColor }: { children: React.ReactNode; accentColor: string }) {
+function Panel({ children, accentColor, style }: { children: React.ReactNode; accentColor: string; style?: React.CSSProperties }) {
   return (
     <div style={{
       background: "var(--panel)",
@@ -266,6 +281,7 @@ function Panel({ children, accentColor }: { children: React.ReactNode; accentCol
       display: "flex",
       flexDirection: "column",
       boxShadow: `0 0 0 0 ${accentColor}`,
+      ...style,
     }}>
       {children}
     </div>
