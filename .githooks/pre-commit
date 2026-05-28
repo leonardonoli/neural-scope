@@ -1,0 +1,20 @@
+#!/bin/bash
+# Auto-sign staged files before every commit
+
+SECURITY_PKG="/var/www/medievo-ops/packages/security"
+PROJECT_ROOT="$(git rev-parse --show-toplevel)"
+PROJECT_NAME="$(basename "$PROJECT_ROOT")"
+
+if [ ! -d "$SECURITY_PKG" ]; then
+  echo "[code-sign] Warning: security package not found at $SECURITY_PKG — skipping"
+  exit 0
+fi
+
+echo "[code-sign] Signing $PROJECT_NAME..."
+cd "$SECURITY_PKG"
+npx tsx bin/code-sign-cli.ts sign "$PROJECT_ROOT" --project "$PROJECT_NAME" --only-modified 2>/dev/null
+
+# Re-stage any files that were modified by the signer
+git -C "$PROJECT_ROOT" add -u
+
+echo "[code-sign] Done."
