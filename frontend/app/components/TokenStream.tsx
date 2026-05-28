@@ -2,15 +2,15 @@
 import { useEffect, useRef } from "react";
 
 interface Token {
-  id: number;
+  id:  number;
   text: string;
-  start: number;
-  end: number;
+  start:  number;
+  end:  number;
 }
 
 interface Props {
-  tokens: Token[];
-  newTokenIndex: number | null;
+  tokens:  Token[];
+  newTokenIndex:  number | null;
 }
 
 export default function TokenStream({ tokens, newTokenIndex }: Props) {

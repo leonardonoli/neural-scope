@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Neural Scope — Transformer Visualizer",
-  description: "Watch a transformer think in real time. Attention, probabilities, tokens — all live.",
+  description:  "Watch a transformer think in real time. Attention, probabilities, tokens — all live.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
