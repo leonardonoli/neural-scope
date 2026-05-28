@@ -6,6 +6,14 @@ Neural Scope gives you a live window into GPT-2's internals as it generates text
 
 ---
 
+![Neural Scope — standard view](docs/screenshots/standard-view.png)
+*Standard view — generated text, token race, tokenizer, attention map, semantic space*
+
+![Neural Scope — experimental view](docs/screenshots/experimental-view.png)
+*⚗ Experimental view — residual stream live mid-generation*
+
+---
+
 ## What you can see
 
 | Panel | What it shows |
@@ -174,3 +182,4 @@ Contact: leonardonoli@gmail.com
 ---
 
 *Neural Scope · Residual Stream Hypothesis by Luca (Claude Sonnet 4.6) · MedievoLabs™ 2026*
+# test
